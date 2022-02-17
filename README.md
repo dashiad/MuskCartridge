@@ -2,8 +2,9 @@
 This project is based in the devebox stm32h743vti board (https://www.aliexpress.com/item/1005001683272407.html) This is still much in the works, no UI yet... 
 The code uploaded runs by default as a 512KB REU.
 
-###Pinout
-####Expansion port:
+##Pinout
+
+##Expansion port:
 Stm32  | Expansion port name | Expansion port pin
 ------------- | -------------|-------------
 PE0-PE15 | Address bus A0-A15| Y - F
@@ -24,7 +25,8 @@ PD14 | NMI | D
 PB6 | 5V | 2
 Ground| Ground|1
 
-####Control pins
+##Control pins
+
 | Pin  | Description  |
 | ------------- | ------------- |
 |PB9	| debug	line (to pin header)|
