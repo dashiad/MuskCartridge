@@ -29,8 +29,7 @@ void EasyFlash::run()
 	while(1)
 	{
 
-		 DWT->CYCCNT=TIM1->CNT*2;
-		 while(DWT->CYCCNT < 270 );
+		CRT_WAITFORCRTPHY2HIGH;
 		 addr=CRT_READADDR;
 		 control=CRT_READCONTROL;
 
