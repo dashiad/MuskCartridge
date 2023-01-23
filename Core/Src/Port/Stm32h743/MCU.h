@@ -161,7 +161,7 @@ public:
 
 
 	inline virtual bool crtHasPower(){return HAL_GPIO_ReadPin(CRT_5V_REGISTER,CRT_PIN_5V)==GPIO_PIN_SET;}
-	inline virtual void resetC64(){crtSetResetLo();HAL_Delay(1);crtSetResetHi();}
+	inline virtual void resetC64(){crtSetResetLo();HAL_Delay(100);crtSetResetHi();}
 
 	inline virtual const char *getModuleName() {return "Stm32h743_MCU";}
 	virtual ~MCU();

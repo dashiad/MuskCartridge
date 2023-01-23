@@ -9,7 +9,7 @@
 #define SRC_SYS_MODULE_H_
 
 namespace Sys {
-
+#define MAX_MODULE_NAME 40
 class Module {
 public:
 	Module(){};

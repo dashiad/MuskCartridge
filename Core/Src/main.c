@@ -19,14 +19,11 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
+#include "fatfs.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "Sys/Result.h"
-#include "Port/Stm32h743/Sys/SDCard.h"
-#include "Port/Stm32h743/Devices/Cartridge/CartridgeDevice.h"
-#include "Port/Stm32h743/Sys/StandAloneHWFactory.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -45,8 +42,6 @@
 
 /* Private variables ---------------------------------------------------------*/
 
-
-
 SD_HandleTypeDef hsd1;
 
 SPI_HandleTypeDef hspi1;
@@ -55,14 +50,9 @@ SPI_HandleTypeDef hspi2;
 TIM_HandleTypeDef htim1;
 
 UART_HandleTypeDef huart3;
-DMA_HandleTypeDef hdma_usart3_rx;
-
-
-
 
 /* USER CODE BEGIN PV */
-#include "ILI9341_STM32_Driver.h"
-#include "ILI9341_GFX.h"
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -73,24 +63,20 @@ static void MX_TIM1_Init(void);
 static void MX_SDMMC1_SD_Init(void);
 static void MX_SPI2_Init(void);
 static void MX_SPI1_Init(void);
-static void MX_DMA_Init(void);
 static void MX_USART3_UART_Init(void);
-
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-using Sys_Result = Sys::Result ;
-__attribute__((__section__(".ram1block"))) uint8_t cart_buffer[512*1024];
+
 /* USER CODE END 0 */
 
 /**
   * @brief  The application entry point.
   * @retval int
   */
-
 int main(void)
 {
   /* USER CODE BEGIN 1 */
@@ -115,6 +101,9 @@ int main(void)
   /* Configure the system clock */
   SystemClock_Config();
 
+/* Configure the peripherals common clocks */
+  PeriphCommonClock_Config();
+
   /* USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */
@@ -123,93 +112,11 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM1_Init();
   MX_SDMMC1_SD_Init();
-  MX_USART3_UART_Init();
-  MX_SPI2_Init();
   MX_FATFS_Init();
-
+  MX_SPI2_Init();
+  MX_SPI1_Init();
+  MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-  /* Setup de la pantalla */
-  Sys_Result res;
-  /*ILI9341_Init();
-
-  // Simple Text writing (Text, Font, X, Y, Color, BackColor)
-  // Available Fonts are FONT1, FONT2, FONT3 and FONT4
-  ILI9341_FillScreen(WHITE);
-  ILI9341_SetRotation(SCREEN_HORIZONTAL_2);
-  ILI9341_DrawText("HELLO WORLD", FONT4, 90, 110, BLACK, WHITE);
-  ILI9341_DrawText("HELLO WORLD 2", FONT4, 90, 130, BLACK, WHITE);
-*/
-  /* Se resetea bluetooth */
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, GPIO_PIN_RESET);
-  HAL_Delay(1000);
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, GPIO_PIN_SET);
-
-
-  /* Inicializacion de fatfs */
-
-  Port::Stm32h743::MCU MCU;
-  MCU.resetC64();
-
-  FIL file;
-  FRESULT fres;
-  unsigned int bytesWritten;
-  Port::Stm32h743::Sys::SDCard sdcard;
-	 sdcard.init(&res);
-  sdcard.init(&res);
-
-  ::Port::Base::Slave sv(1,"miSlave",4,5);
-  ::Port::Base::Device dv(&sv, "miDevice",5, 10);
-  ::Port::Stm32h743::Sys::SerialInterface ser(&huart3);
-  sv.run(&ser);
-
-/*  ::Port::Stm32h743::Sys::StandAloneHWFactory factory(
-		  GPIOC, GPIO_PIN_0,
-		  GPIOC, GPIO_PIN_1,
-		  &huart3);
-  ::Port::Base::UIRepr *ui;
-  ::Port::Base::Master master(&factory);
-
-  ui=master.getUI();
-  Port::Stm32h743::Sys::HC05BluetoothInterface *bt=(Port::Stm32h743::Sys::HC05BluetoothInterface *)(ui->comms);
-  bt->connect();
-  master.run();
-
-*/
-
-
-
-
-
-  Port::Stm32h743::Devices::CartridgeDevice cartDevice(&MCU,&sdcard,cart_buffer,sizeof(cart_buffer));
-  if(res.isOk())
-  {
-	  // Ghost & Goblins: 280/450/  --> data a 430
-	//   cartDevice.mount("/testCartridges/CRT_NORMAL_CARTRIDGE/Frogger 2.crt",&res);
-	  cartDevice.mount("0:/kk.crt",&res);
-	  cartDevice.mount("/testCartridges/CRT_NORMAL_CARTRIDGE/Aegean Voyage.crt",&res);
-	//  cartDevice.mount("/testCartridges/CRT_NORMAL_CARTRIDGE/AMC - Attack of the Mutant Camels.crt",&res);
-
-//	  cartDevice.mount("/testCartridges/CRT_MAGIC_DESK_DOMARK_HES_AUSTRALIA/Boulder Dash 1.crt",&res);
-//    cartDevice.mount("/testCartridges/CRT_MAGIC_DESK_DOMARK_HES_AUSTRALIA/Ghost 'n Goblins.crt",&res);
-//	  cartDevice.mount("/testCartridges/CRT_OCEAN_TYPE_1/Batman - The Movie.crt",&res);
-//	  cartDevice.mount("/testCartridges/CRT_OCEAN_TYPE_1/robocop2.crt",&res);
-//	  cartDevice.mount("/testCartridges/CRT_EASYFLASH/r-type.crt",&res);
-//	  cartDevice.mountDevice(::Devices::Cartridge::crtDevice::CRT_DEVICE_REU);
-
-//	  cartDevice.mount("/testCartridges/CRT_EASYFLASH/Tool Collection.crt",&res);
-//	  cartDevice.mount("/testCartridges/CRT_EASYFLASH/Prince of Persia_+9.NO.crt",&res);
-
-
-//	  cartDevice.mount("/testCartridges/CRT_OCEAN_TYPE_1/spacegun.crt",&res);
-
-
-//	  cartDevice.mount("/testCartridges/CRT_OCEAN_TYPE_1/cyberball.crt",&res);
-
-//	  cartDevice.mount("1.crt",&res);
-  }
-
-
-
 
   /* USER CODE END 2 */
 
@@ -225,9 +132,6 @@ int main(void)
 }
 
 /**
-  * @brief System Clock Configuration
-  * @retval None
-  *//**
   * @brief System Clock Configuration
   * @retval None
   */
@@ -567,7 +471,7 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, DMA_Pin|RESET_Pin|NMI_Pin|IRQ_Pin
-                          |EMAG_Pin|EXROM_Pin, GPIO_PIN_SET);
+                          |EMAG_Pin|EXROM_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : Address2_Pin Address3_Pin Address4_Pin Address5_Pin
                            Address6_Pin Address7_Pin Address8_Pin Address9_Pin

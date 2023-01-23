@@ -79,6 +79,7 @@ size_t FatFsFile::write(uint8_t *buffer,int len,Sys_Result *res)
 		}
 	size_t bytesWritten;
 	FRESULT fres = f_write(&file, (const void *)buffer, len, &bytesWritten);
+
 	if (fres != FR_OK)
 	{
 		res->setError(getModuleName(),FatFsFile::RES_FILE_WRITE_ERROR);

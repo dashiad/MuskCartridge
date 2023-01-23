@@ -23,6 +23,7 @@ namespace Port::Base{
 			res->setError(getModuleName(), FatFsFilesystem::RES_FS_ERROR);
 			return false;
 		}
+
 		return true;
 
 	}

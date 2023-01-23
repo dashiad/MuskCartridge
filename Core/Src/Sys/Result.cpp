@@ -16,6 +16,7 @@ Result::Result() {
 
 void Result::setError(const char *_errModule,const char *_errMessage)
 {
+	hasError=true;
 	errModule=_errModule;
 	errMessage=_errMessage;
 }

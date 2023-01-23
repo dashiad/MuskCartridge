@@ -17,6 +17,7 @@ public:
 	inline bool isErrored(){return hasError;}
 	void setError(const char *errModule,const char *errMessage);
 	inline bool isOk(){return !hasError;}
+	inline void setOk(){hasError=false;}
 	virtual ~Result();
 protected:
 	bool hasError;
